@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7 SABER SHOP - Robux, Stars & Premium</title>
+
+    <!-- SEO Tags -->
+    <meta name="description" content="Eng arzon va xavfsiz Robux, Telegram Stars va Telegram Premium xizmatlari.">
+    <meta name="keywords" content="robux sotib olish, telegram premium uzbekistan, stars narxlari">
+
+    <!-- Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap">
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --primary: #FFD700;
+            --secondary: #00FF88;
+            --bg: #050505;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+            --text-muted: #a0a0a0;
+            --gradient: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        .glass {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+        }
+
+        .text-gradient {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: #000;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        section {
+            padding: 80px 0;
+        }
+
+        .app-main {
+            min-height: 100vh;
+            display: flex;
+            flexDirection: column;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem !important;
+            }
+
+            nav {
+                padding: 20px !important;
+                gap: 15px !important;
+                flex-direction: column;
+                position: relative !important;
+                margin: 10px !important;
+            }
+
+            nav>div {
+                gap: 15px !important;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, createContext, useContext } = React;
+        const { motion, AnimatePresence } = FramerMotion;
+
+        // Custom Icon Component using Lucide
+        const Icon = ({ name, size = 20, className = "" }) => {
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }, [name]);
+            return <i data-lucide={name} style={{ width: size, height: size }} className={className}></i>;
+        };
+
+        const CartContext = createContext();
+
+        const CartProvider = ({ children }) => {
+            const [cartItems, setCartItems] = useState(() => {
+                const savedCart = localStorage.getItem('cart_html');
+                return savedCart ? JSON.parse(savedCart) : [];
+            });
+            const [currentPage, setCurrentPage] = useState('home');
+            const [currentType, setCurrentType] = useState('robux');
+
+            useEffect(() => {
+                localStorage.setItem('cart_html', JSON.stringify(cartItems));
+            }, [cartItems]);
+
+            const addToCart = (item) => {
+                setCartItems(prev => {
+                    const existingItem = prev.find(i => i.id === item.id);
+                    if (existingItem) return prev.map(i => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
+                    return [...prev, { ...item, quantity: 1 }];
+                });
+            };
+
+            const removeFromCart = (id) => setCartItems(prev => prev.filter(item => item.id !== id));
+            const updateQuantity = (id, quantity) => {
+                if (quantity < 1) return removeFromCart(id);
+                setCartItems(prev => prev.map(item => item.id === id ? { ...item, quantity } : item));
+            };
+            const clearCart = () => setCartItems([]);
+            const getCartTotal = () => cartItems.reduce((total, item) => total + (parseInt(item.price.replace(/[^\d]/g, '')) * item.quantity), 0);
+
+            const checkout = async () => {
+                if (cartItems.length === 0) return;
+                const BOT_TOKEN = "7864335552:AAH9fN77E8Yy1hK0f_Y7Y7Y7Y7Y7Y7Y7Y7Y"; // O'zingizniki bilan almashtiring
+                const CHAT_ID = "634842123";
+
+                let message = "🛍️ *Yangi buyurtma!*\n\n";
+                cartItems.forEach((item, index) => {
+                    message += `${index + 1}. *${item.title}*\n   ⤷ ${item.amount} (${item.quantity} ta) - ${item.price}\n`;
+                });
+                message += `\n💰 *Umumiy summa:* ${getCartTotal().toLocaleString()} UZS`;
+
+                try {
+                    const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: 'Markdown' })
+                    });
+                    if (res.ok) { alert("Buyurtmangiz yuborildi! ✅"); clearCart(); } else throw new Error();
+                } catch (e) {
+                    window.open(`https://t.me/qwertye_e?text=${encodeURIComponent(message.replace(/\*/g, ''))}`, '_blank');
+                }
+            };
+
+            return (
+                <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, clearCart, getCartTotal, checkout, currentPage, setCurrentPage, currentType, setCurrentType }}>
+                    {children}
+                </CartContext.Provider>
+            );
+        };
+
+        const useCart = () => useContext(CartContext);
+
+        const Navbar = () => {
+            const { cartItems, removeFromCart, updateQuantity, getCartTotal, checkout, setCurrentPage, setCurrentType } = useCart();
+            const [isCartOpen, setIsCartOpen] = useState(false);
+            const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+
+            const navItems = [
+                { name: 'HOME', type: 'home' },
+                { name: 'ROBUX', type: 'robux' },
+                { name: 'STARS', type: 'stars' },
+                { name: 'TON', type: 'ton' },
+                { name: 'PREMIUM', type: 'premium' },
+            ];
+
+            const navigate = (type) => {
+                if (type === 'home') setCurrentPage('home');
+                else { setCurrentPage('prices'); setCurrentType(type); }
+            };
+
+            return (
+                <>
+                    <nav className="glass" style={{ position: 'sticky', top: '20px', margin: '0 20px', zIndex: 1000, padding: '10px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px' }}>
+                        <div onClick={() => setCurrentPage('home')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div style={{ width: '40px', height: '40px', background: 'var(--gradient)', borderRadius: '10px', display: 'flex', justifyContent: 'center', alignItems: 'center', fontWeight: 'bold', color: '#000' }}>S</div>
+                            <span style={{ fontWeight: 800, fontSize: '1.2rem', letterSpacing: '2px' }}>SHOP</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
+                            {navItems.map(item => (
+                                <div key={item.name} onClick={() => navigate(item.type)} className="nav-link" style={{ cursor: 'pointer' }}>{item.name}</div>
+                            ))}
+                            <button onClick={() => setIsCartOpen(true)} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', position: 'relative' }}>
+                                <Icon name="shopping-cart" size={24} />
+                                {cartCount > 0 && <span style={{ position: 'absolute', top: '-8px', right: '-8px', background: 'var(--primary)', color: '#000', fontSize: '0.7rem', fontWeight: 'bold', width: '18px', height: '18px', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>{cartCount}</span>}
+                            </button>
+                        </div>
+                    </nav>
+                    <AnimatePresence>
+                        {isCartOpen && (
+                            <>
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsCartOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(5px)', zIndex: 2000 }} />
+                                <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} style={{ position: 'fixed', top: 0, right: 0, bottom: 0, width: '100%', maxWidth: '400px', background: '#111', borderLeft: '1px solid var(--border)', zIndex: 2001, padding: '30px', display: 'flex', flexDirection: 'column' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '30px' }}>
+                                        <h2 style={{ fontWeight: 800 }}>SAVAT</h2>
+                                        <button onClick={() => setIsCartOpen(false)} style={{ background: 'none', border: 'none', color: '#fff' }}><Icon name="x" size={24} /></button>
+                                    </div>
+                                    <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                        {cartItems.length === 0 ? <p style={{ textAlign: 'center', opacity: 0.5 }}>Savat bo'sh</p> : cartItems.map(item => (
+                                            <div key={item.id} className="glass" style={{ padding: '15px' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                    <div><h4 style={{ color: 'var(--primary)', fontSize: '0.8rem' }}>{item.title}</h4><p style={{ fontWeight: 700 }}>{item.amount}</p></div>
+                                                    <button onClick={() => removeFromCart(item.id)} style={{ background: 'none', border: 'none', color: '#ff4444' }}><Icon name="trash-2" size={18} /></button>
+                                                </div>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '20px', padding: '5px 10px' }}>
+                                                        <button onClick={() => updateQuantity(item.id, item.quantity - 1)} style={{ background: 'none', border: 'none', color: '#fff' }}><Icon name="minus" size={14} /></button>
+                                                        <span>{item.quantity}</span>
+                                                        <button onClick={() => updateQuantity(item.id, item.quantity + 1)} style={{ background: 'none', border: 'none', color: '#fff' }}><Icon name="plus" size={14} /></button>
+                                                    </div>
+                                                    <span style={{ fontWeight: 700 }}>{item.price}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {cartItems.length > 0 && (
+                                        <div style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid var(--border)' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}><span>Jami:</span><span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)' }}>{getCartTotal().toLocaleString()} UZS</span></div>
+                                            <button onClick={checkout} className="btn-primary" style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: '10px' }}><Icon name="send" size={18} /> BUYURTMA</button>
+                                        </div>
+                                    )}
+                                </motion.div>
+                            </>
+                        )}
+                    </AnimatePresence>
+                </>
+            );
+        };
+
+        const Home = () => {
+            const { setCurrentPage, setCurrentType } = useCart();
+            const categories = [
+                { name: 'ROBUX', type: 'robux', icon: 'shopping-cart', color: '#FFD700' },
+                { name: 'STARS', type: 'stars', icon: 'star', color: '#FF8800' },
+                { name: 'TON', type: 'ton', icon: 'zap', color: '#0088FF' },
+                { name: 'PREMIUM', type: 'premium', icon: 'crown', color: '#FF00FF' },
+            ];
+            return (
+                <div className="container">
+                    <section style={{ textAlign: 'center' }}>
+                        <motion.h1 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} style={{ fontSize: '4.5rem', fontWeight: 800 }}>ONLINE <span className="text-gradient">SHOP</span></motion.h1>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', marginBottom: '40px' }}>Sizning ishonchli raqamli xizmatlar do'koningiz.</p>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+                            {categories.map(cat => (
+                                <div key={cat.name} onClick={() => { setCurrentPage('prices'); setCurrentType(cat.type); }} className="glass" style={{ padding: '30px', cursor: 'pointer', transition: 'all 0.3s' }}>
+                                    <div style={{ color: cat.color, marginBottom: '15px' }}><Icon name={cat.icon} size={32} /></div>
+                                    <h3 style={{ fontWeight: 800 }}>{cat.name}</h3>
+                                    <p style={{ fontSize: '0.8rem', opacity: 0.5, marginTop: '10px' }}>NARXLARNI KO'RISH</p>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        const priceData = {
+            robux: { title: "ROBUX", subtitle: "🟡 Tezkor va xavfsiz 🟡", items: [{ amount: "40 Robux", price: "10.000 UZS" }, { amount: "400 Robux", price: "70.000 UZS" }, { amount: "800 Robux", price: "145.000 UZS" }, { amount: "1000 Robux", price: "145.000 UZS" }] },
+            stars: { title: "STARS", subtitle: "🧡 Telegram Stars 🧡", items: [{ amount: "50 Stars", price: "10.000 UZS" }, { amount: "100 Stars", price: "20.000 UZS" }, { amount: "500 Stars", price: "100.000 UZS" }] },
+            premium: { title: "PREMIUM", subtitle: "🔵 Akkauntga kirmasdan 🔵", items: [{ amount: "3 Oy", price: "155.000 UZS" }, { amount: "1 Yil", price: "380.000 UZS" }] },
+            ton: { title: "TON", subtitle: "🤑 Crypto 🤑", note: "Narxlarni lichkada kelishamiz." }
+        };
+
+        const Prices = () => {
+            const { currentType, addToCart } = useCart();
+            const data = priceData[currentType];
+            const [addedId, setAddedId] = useState(null);
+
+            const handleAdd = (item, idx) => {
+                const id = `${currentType}-${idx}`;
+                addToCart({ id, title: data.title, amount: item.amount, price: item.price });
+                setAddedId(id);
+                setTimeout(() => setAddedId(null), 2000);
+            };
+
+            return (
+                <div className="container">
+                    <section style={{ textAlign: 'center' }}>
+                        <h1 style={{ fontSize: '3rem', fontWeight: 800 }}>{data.title}</h1>
+                        <p style={{ color: 'var(--text-muted)' }}>{data.subtitle}</p>
+                        <div className="glass" style={{ maxWidth: '600px', margin: '40px auto', padding: '40px' }}>
+                            {data.items ? data.items.map((item, idx) => (
+                                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px', marginBottom: '10px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px' }}>
+                                    <span>{item.amount}</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                        <span style={{ color: 'var(--primary)', fontWeight: 700 }}>{item.price}</span>
+                                        <button onClick={() => handleAdd(item, idx)} style={{ background: addedId === `${currentType}-${idx}` ? 'var(--secondary)' : 'var(--gradient)', border: 'none', borderRadius: '50%', width: '35px', height: '35px', cursor: 'pointer', color: '#000' }}>
+                                            <Icon name={addedId === `${currentType}-${idx}` ? "check" : "shopping-cart"} size={18} />
+                                        </button>
+                                    </div>
+                                </div>
+                            )) : <p>{data.note}</p>}
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const { currentPage } = useCart();
+            return (
+                <div className="app-main">
+                    <Navbar />
+                    <main style={{ flex: 1 }}>
+                        {currentPage === 'home' ? <Home /> : <Prices />}
+                    </main>
+                    <footer style={{ padding: '40px', textAlign: 'center', opacity: 0.5 }}>© 2024 7 SABER SHOP</footer>
+                </div>
+            );
+        };
+
+        const Root = () => (
+            <CartProvider>
+                <App />
+            </CartProvider>
+        );
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<Root />);
+    </script>
+</body>
+
+</html>
